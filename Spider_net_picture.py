@@ -3,7 +3,11 @@
 import  requests
 from bs4 import  BeautifulSoup
 import time
+import pymongo
 
+myclient = pymongo.MongoClient("mongodb://192.168.174.134:27017/")
+mydb = myclient["ddsdb"]
+mycol = mydb["t5"]
 url = "https://shenzhen.cncn.com/jingdian/"
 urls = ["https://shenzhen.cncn.com/jingdian/1-{}-0-0.html" .format(str(i)) for i in range(1,14,1)]
 headers = {
@@ -23,11 +27,11 @@ def get_url(url):
             'title':title.get_text(),
             'img':img.get('data-original')
         }
-
         print(data)
+        mycol.insert_one(data)
+
 for single_url in urls:
     get_url(single_url)
-
 
 
 
