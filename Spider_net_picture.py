@@ -1,46 +1,47 @@
-# -*-coding:utf-8-*-
-
-import  requests
-from bs4 import  BeautifulSoup
+from bs4 import BeautifulSoup
+import requests
+import request
+import urllib
 import time
-import pymongo
+import os
 
-myclient = pymongo.MongoClient("mongodb://192.168.174.134:27017/")
-mydb = myclient["ddsdb"]
-mycol = mydb["t5"]
-url = "https://shenzhen.cncn.com/jingdian/"
-urls = ["https://shenzhen.cncn.com/jingdian/1-{}-0-0.html" .format(str(i)) for i in range(1,14,1)]
-headers = {
-    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
-    'cookie':'local_city_name=%E5%8C%97%E4%BA%AC; local_zone=110000%7Cbeijing%7C%B1%B1%BE%A9%7C54511; local_city_name=%E5%8C%97%E4%BA%AC; UM_distinctid=16bb0687a372f9-043522f3aecb89-e353165-1fa400-16bb0687a383de; CNZZDATA1089612=cnzz_eid%3D1133401860-1562027537-https%253A%252F%252Fwww.baidu.com%252F%26ntime%3D1562027537; PHPSESSID=497t0sddltl9nsrm5bbnndms50; Hm_lvt_d64174522c86449826babe56fb2a88ff=1562032766; Hm_lpvt_d64174522c86449826babe56fb2a88ff=1562032769'
+url = 'http://jandan.net/ooxx/page-1'
+urls = ['http://jandan.net/ooxx/page-{}'.format(i) for i in range(1, 10)]
+header = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+    'Cookie': '_ga=GA1.2.162437312.1562479460; _gid=GA1.2.580201545.1562479460'
 }
+file_path = 'D:\download'
+judg_file = os.path.exists('D:\download')
+
 
 def get_url(url):
-    wb_data = requests.get(url,headers)
-    time.sleep(2)
-    Soup = BeautifulSoup(wb_data.text,'lxml')
-    imgs = Soup.select("img[width='287']")
-    titles = Soup.select("  div.title > b")
+    # judg file is exsist or not
+    if judg_file == False:
+        os.mkdir(file_path)
+    else:
+        pass
 
-    for title,img in zip(titles,imgs):
-        data = {
-            'title':title.get_text(),
-            'img':img.get('data-original')
-        }
-        print(data)
-        mycol.insert_one(data)
+    wb_data = requests.get(url, header)
+    time.sleep(1)
+    Soup = BeautifulSoup(wb_data.text, 'lxml')
+    pic_url = Soup.find_all('img')
+    path = "D://download/"
+    down_load = []
 
-for single_url in urls:
-    get_url(single_url)
+    for picture in (pic_url):
+        pic_list = picture.get('src')
+        down_load.append("http:" + pic_list)
 
-
-
-"""
-body > div.content.mt20 > div.box_list > div.city_spots > div.icon > ul > li.first > a > img
-body > div.content.mt20 > div.box_list > div.city_spots > div.city_spots_list > ul > li:nth-child(2) > a > div.title > b
-"""
+    for item in down_load:
+        urllib.request.urlretrieve(item, path + item[-10:])
+        print('downloading ............')
 
 
+def get_more_url():
+    for get_more in urls:
+        get_url(get_more)
 
 
+get_more_url()
 
