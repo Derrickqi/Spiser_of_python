@@ -28,6 +28,7 @@ i = 1
 def get_url(url):
   res = requests.get(url)
   resp = res.json()
+  # 图片链接为Dict格式，所以需要一层层过滤
   for item in resp['data']['object_list']:
      img_url = item['photo']['path']
      img_list.append(img_url)
