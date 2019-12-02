@@ -40,7 +40,9 @@ def get_info(source):
 
 
 def writemovie(MovieList):
+    #将数据导入CSV文件
     with open('doubantop250_movieList.csv','a',encoding="UTF-8",newline='')as f:
+    #插入标题头信息
         writer = csv.DictWriter(f,fieldnames=['title','actors','stars','intros','links'])
         writer.writeheader()
         for i in MovieList:
